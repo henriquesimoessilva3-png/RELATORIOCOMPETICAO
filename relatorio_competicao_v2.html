@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scout Report — Relatório de Competição</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: 'Barlow', sans-serif;
+  background: #0b0d12;
+  color: #e8ecf3;
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════
+   CSS VARS
+═══════════════════════════════════════ */
+:root {
+  --gold: #e8c84a;
+  --gold-dim: rgba(232,200,74,0.12);
+  --blue: #3a7bd5;
+  --bg: #0b0d12;
+  --card: #12151d;
+  --card2: #181c27;
+  --border: #222840;
+  --text: #e8ecf3;
+  --muted: #5a6278;
+  --red: #e84a4a;
+  --green: #4ae890;
+}
+
+/* ═══════════════════════════════════════
+   TABS
+═══════════════════════════════════════ */
+.app-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 1.2rem 2rem 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+  position: sticky; top: 0; z-index: 100;
+}
+
+.tab-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 0.75rem 1.4rem 0.85rem;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+.tab-btn:hover:not(.active) { color: var(--text); }
+
+.tab-brand {
+  margin-left: auto;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+/* ═══════════════════════════════════════
+   PANELS
+═══════════════════════════════════════ */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ═══════════════════════════════════════
+   FORM PANEL
+═══════════════════════════════════════ */
+.form-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.fsection {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.fsection-head {
+  background: var(--card2);
+  border-bottom: 1px solid var(--border);
+  padding: 0.85rem 1.2rem;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+
+.fsection-head h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.fsection-body { padding: 1.2rem; }
+
+.fg { display: grid; gap: 0.9rem; }
+.fg2 { grid-template-columns: 1fr 1fr; }
+.fg3 { grid-template-columns: 1fr 1fr 1fr; }
+.fg4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.s2 { grid-column: span 2; }
+.s3 { grid-column: span 3; }
+.s4 { grid-column: span 4; }
+
+@media(max-width:640px){
+  .fg2,.fg3,.fg4{ grid-template-columns:1fr 1fr; }
+  .s3,.s4{ grid-column:span 2; }
+}
+@media(max-width:400px){
+  .fg2,.fg3,.fg4{ grid-template-columns:1fr; }
+  .s2,.s3,.s4{ grid-column:span 1; }
+}
+
+.fl { display: flex; flex-direction: column; gap: 0.35rem; }
+
+.fl label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.fl input, .fl select, .fl textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.92rem;
+  padding: 0.55rem 0.8rem;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+
+.fl select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%235a6278' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  padding-right: 2rem;
+  cursor: pointer;
+}
+
+.fl textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
+.fl input:focus, .fl select:focus, .fl textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(58,123,213,0.18);
+}
+.fl input::placeholder, .fl textarea::placeholder { color: var(--muted); opacity: 0.45; }
+
+/* ── Attrs rating ── */
+.attrs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media(max-width:500px){ .attrs-grid{ grid-template-columns:1fr; } }
+
+.attr-row { display: flex; flex-direction: column; gap: 0.3rem; }
+
+.attr-row-top {
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.attr-row-top span:first-child {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.attr-score {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--gold);
+  min-width: 18px; text-align: right;
+}
+
+.attr-dots {
+  display: flex; gap: 3px;
+}
+
+.dot {
+  width: 100%; max-width: 22px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--border);
+  cursor: pointer;
+  transition: background 0.12s, transform 0.1s;
+  flex: 1;
+}
+
+.dot:hover { transform: scaleY(1.3); }
+.dot.filled { background: var(--gold); }
+.dot.filled.low { background: var(--red); }
+.dot.filled.mid { background: #e8a44a; }
+.dot.filled.hi  { background: var(--green); }
+
+/* ── Photo upload ── */
+.photo-zone {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.photo-zone:hover { border-color: var(--blue); background: rgba(58,123,213,0.04); }
+
+.photo-zone input[type="file"] {
+  position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;
+}
+
+.photo-zone .pz-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+.photo-zone p { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+.photo-zone strong { color: var(--text); font-size: 0.85rem; }
+
+#photo-preview {
+  display: none;
+  width: 90px; height: 110px;
+  border-radius: 6px;
+  object-fit: cover;
+  margin: 0.8rem auto 0;
+  border: 2px solid var(--gold);
+}
+
+/* ── Form actions ── */
+.form-actions {
+  display: flex; justify-content: flex-end; gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.7rem 1.6rem;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.btn:hover { opacity: 0.82; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.btn-generate { background: var(--gold); color: #0b0d12; }
+
+/* ═══════════════════════════════════════
+   REPORT PANEL
+═══════════════════════════════════════ */
+.report-wrap {
+  padding: 2rem 1.5rem 4rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.report-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-print { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 5rem 2rem;
+}
+
+.empty-state .es-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; }
+.empty-state p {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── REPORT CARD — matches Keynote design ── */
+.report-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* top accent line */
+.report-card::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+/* ── Header strip ── */
+.rc-header {
+  background: var(--card2);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rc-header-left { display: flex; align-items: center; gap: 0.8rem; }
+
+.rc-comp {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rc-date {
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+.rc-match {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.rc-score-pill {
+  background: var(--gold);
+  color: #0b0d12;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  padding: 0.1rem 0.7rem;
+  border-radius: 5px;
+}
+
+/* ── Main body ── */
+.rc-body {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  min-height: 380px;
+}
+
+@media(max-width:650px){ .rc-body{ grid-template-columns:1fr; } }
+
+/* Left: photo + meta */
+.rc-left {
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.rc-photo-wrap {
+  position: relative;
+  background: #0b0d12;
+  flex: 1;
+  min-height: 220px;
+  overflow: hidden;
+}
+
+.rc-photo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+  filter: grayscale(20%) contrast(1.05);
+}
+
+.rc-photo-placeholder {
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  opacity: 0.12;
+  background: linear-gradient(180deg, #1a1e2a, #0b0d12);
+}
+
+.rc-pos-tag {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(0deg, rgba(11,13,18,0.95) 0%, transparent 100%);
+  padding: 1.5rem 0.9rem 0.6rem;
+}
+
+.rc-position {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* meta pills below photo */
+.rc-meta {
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.rc-meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.rc-meta-lbl {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  min-width: 60px;
+  flex-shrink: 0;
+}
+
+.rc-meta-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.rc-meta-val.gold { color: var(--gold); }
+
+/* Right column */
+.rc-right {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Player name area */
+.rc-name-area {
+  padding: 1.2rem 1.4rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(232,200,74,0.04) 0%, transparent 60%);
+}
+
+.rc-club-line {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.2rem;
+}
+
+.rc-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.8rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--text);
+  text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+.rc-name-sub {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 0.2rem;
+}
+
+/* Attributes */
+.rc-attrs {
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  flex: 1;
+}
+
+.rc-attrs-title {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.8rem;
+}
+
+.rc-attr-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1.2rem;
+}
+
+@media(max-width:500px){ .rc-attr-list{ grid-template-columns:1fr; } }
+
+.rc-attr-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.rc-attr-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rc-attr-name {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rc-attr-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.rc-attr-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.rc-attr-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* Strengths / Weaknesses */
+.rc-sw {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--border);
+}
+
+.rc-sw-col { padding: 1rem 1.4rem; }
+.rc-sw-col:first-child { border-right: 1px solid var(--border); }
+
+.rc-sw-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+
+.sw-strong .rc-sw-title { color: var(--green); }
+.sw-weak .rc-sw-title { color: var(--red); }
+
+.rc-sw-text {
+  font-size: 0.8rem;
+  color: #9aa3b8;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* Footer */
+.rc-footer {
+  background: var(--card2);
+  border-top: 1px solid var(--border);
+  padding: 0.85rem 1.4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.rc-rec-badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.85rem;
+  border-radius: 5px;
+}
+
+.rec-A { background: rgba(74,232,144,0.15); color: var(--green); border: 1px solid rgba(74,232,144,0.3); }
+.rec-B { background: rgba(58,123,213,0.15); color: #6ba3e8; border: 1px solid rgba(58,123,213,0.3); }
+.rec-C { background: rgba(232,200,74,0.15); color: var(--gold); border: 1px solid rgba(232,200,74,0.3); }
+.rec-D { background: rgba(232,74,74,0.15); color: var(--red); border: 1px solid rgba(232,74,74,0.3); }
+
+.rc-overall {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.rc-overall-lbl {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rc-overall-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.rc-scout-lbl {
+  font-size: 0.7rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* Notes section */
+.rc-notes {
+  border-top: 1px solid var(--border);
+  padding: 1rem 1.4rem;
+}
+
+.rc-notes-title {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+
+.rc-notes-text {
+  font-size: 0.82rem;
+  color: #8a93a8;
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════
+   PRINT
+═══════════════════════════════════════ */
+@media print {
+  body { background: #0b0d12 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .app-tabs, .report-actions, .form-wrap { display: none !important; }
+  .panel { display: block !important; }
+  #panelForm { display: none !important; }
+  #panelReport { display: block !important; padding: 0; }
+  .report-wrap { padding: 0; max-width: 100%; }
+  .empty-state { display: none; }
+  .report-card { border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- TABS -->
+<div class="app-tabs">
+  <button class="tab-btn active" onclick="switchTab('form')">① Preencher</button>
+  <button class="tab-btn" id="tabReport" onclick="switchTab('report')">② Ver Relatório</button>
+  <div class="tab-brand">Scout Report</div>
+</div>
+
+<!-- ═══ FORM PANEL ═══ -->
+<div class="panel active" id="panelForm">
+<div class="form-wrap">
+
+  <!-- COMPETIÇÃO -->
+  <div class="fsection">
+    <div class="fsection-head"><span>🏆</span><h3>Competição</h3></div>
+    <div class="fsection-body">
+      <div class="fg fg3">
+        <div class="fl"><label>Competição / Torneio</label><input id="f_comp" type="text" placeholder="Ex.: Copa São Paulo Sub-20"></div>
+        <div class="fl"><label>Data do Jogo</label><input id="f_data" type="date"></div>
+        <div class="fl"><label>Scout</label><input id="f_scout" type="text" placeholder="Seu nome"></div>
+        <div class="fl"><label>Time A</label><input id="f_timeA" type="text" placeholder="Clube / País"></div>
+        <div class="fl"><label>Time B</label><input id="f_timeB" type="text" placeholder="Clube / País"></div>
+        <div class="fl"><label>Placar Final</label><input id="f_placar" type="text" placeholder="2 — 1"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATLETA -->
+  <div class="fsection">
+    <div class="fsection-head"><span>👤</span><h3>Perfil do Atleta</h3></div>
+    <div class="fsection-body">
+      <div class="fg fg4">
+        <div class="fl s2"><label>Nome Completo</label><input id="f_nome" type="text" placeholder="Nome do Atleta"></div>
+        <div class="fl"><label>Data de Nascimento</label><input id="f_dob" type="date"></div>
+        <div class="fl"><label>Nacionalidade</label><input id="f_nac" type="text" placeholder="Brasil"></div>
+
+        <div class="fl s2"><label>Clube Atual</label><input id="f_clube" type="text" placeholder="Ex.: Flamengo - BRA"></div>
+        <div class="fl">
+          <label>Posição</label>
+          <select id="f_pos">
+            <option value="">Selecionar…</option>
+            <optgroup label="Goleiro">
+              <option value="GK">Goleiro (GK)</option>
+            </optgroup>
+            <optgroup label="Defensores">
+              <option value="ZAG">Zagueiro</option>
+              <option value="LD">Lateral Direito</option>
+              <option value="LE">Lateral Esquerdo</option>
+              <option value="LI">Líbero</option>
+            </optgroup>
+            <optgroup label="Meio-Campo">
+              <option value="VOL">Volante</option>
+              <option value="MC">Meia Central</option>
+              <option value="MAD">Meia Atacante Dir.</option>
+              <option value="MAE">Meia Atacante Esq.</option>
+              <option value="MEI">Meia Ofensivo</option>
+              <option value="MED">Meia Defensivo</option>
+            </optgroup>
+            <optgroup label="Atacantes">
+              <option value="ALD">Atacante Direito</option>
+              <option value="ALE">Atacante Esquerdo</option>
+              <option value="SA">Segundo Atacante</option>
+              <option value="CA">Centroavante</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="fl">
+          <label>Pé Dominante</label>
+          <select id="f_pe">
+            <option value="">—</option>
+            <option>Direito</option>
+            <option>Esquerdo</option>
+            <option>Ambidestro</option>
+          </select>
+        </div>
+
+        <div class="fl"><label>Altura (cm)</label><input id="f_alt" type="number" placeholder="185" min="140" max="220"></div>
+        <div class="fl">
+          <label>Tipo Físico</label>
+          <select id="f_fis">
+            <option value="">—</option>
+            <option>Magro / Esguio</option>
+            <option>Atlético</option>
+            <option>Forte / Musculoso</option>
+            <option>Robusto</option>
+          </select>
+        </div>
+        <div class="fl"><label>Fim de Contrato</label><input id="f_contrato" type="date"></div>
+        <div class="fl"><label>Valor TM (EUR)</label><input id="f_tm_val" type="text" placeholder="€ 500.000"></div>
+
+        <div class="fl s2"><label>Link Transfermarkt</label><input id="f_tm_link" type="url" placeholder="https://www.transfermarkt.com.br/…"></div>
+        <div class="fl s2"><label>Vídeo / Wyscout / Ogol</label><input id="f_vid" type="url" placeholder="https://…"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOTO -->
+  <div class="fsection">
+    <div class="fsection-head"><span>📷</span><h3>Foto do Atleta</h3></div>
+    <div class="fsection-body">
+      <div class="photo-zone">
+        <input type="file" id="f_foto" accept="image/*">
+        <div class="pz-icon">📷</div>
+        <p><strong>Clique para carregar foto</strong><br>JPG, PNG, WEBP</p>
+        <img id="photo-preview" src="" alt="preview">
+      </div>
+    </div>
+  </div>
+
+  <!-- ATRIBUTOS TÉCNICOS -->
+  <div class="fsection">
+    <div class="fsection-head"><span>⚽</span><h3>Atributos Técnicos — Nota de 1 a 10</h3></div>
+    <div class="fsection-body">
+      <div class="attrs-grid" id="attrsContainer"></div>
+    </div>
+  </div>
+
+  <!-- ANÁLISE QUALITATIVA -->
+  <div class="fsection">
+    <div class="fsection-head"><span>📋</span><h3>Análise Qualitativa</h3></div>
+    <div class="fsection-body">
+      <div class="fg fg2">
+        <div class="fl">
+          <label>Pontos Fortes (Strengths)</label>
+          <textarea id="f_forcas" placeholder="Liste os principais pontos fortes observados…"></textarea>
+        </div>
+        <div class="fl">
+          <label>Pontos Fracos (Weaknesses)</label>
+          <textarea id="f_fraquezas" placeholder="Liste as áreas a desenvolver…"></textarea>
+        </div>
+        <div class="fl s2">
+          <label>Observações Gerais</label>
+          <textarea id="f_obs" placeholder="Contexto tático, comportamento, liderança, pressão, posicionamento…" style="min-height:100px"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECOMENDAÇÃO -->
+  <div class="fsection">
+    <div class="fsection-head"><span>🎯</span><h3>Recomendação Final</h3></div>
+    <div class="fsection-body">
+      <div class="fg fg3">
+        <div class="fl">
+          <label>Recomendação</label>
+          <select id="f_rec">
+            <option value="">Selecionar…</option>
+            <option value="A">A — Contratar imediatamente</option>
+            <option value="B">B — Monitorar de perto</option>
+            <option value="C">C — Observar novamente</option>
+            <option value="D">D — Não recomendado</option>
+          </select>
+        </div>
+        <div class="fl">
+          <label>Prioridade</label>
+          <select id="f_prio">
+            <option value="">—</option>
+            <option>Alta</option>
+            <option>Média</option>
+            <option>Baixa</option>
+          </select>
+        </div>
+        <div class="fl">
+          <label>Nota Geral (0–10)</label>
+          <input id="f_nota" type="number" placeholder="7.5" min="0" max="10" step="0.5">
+        </div>
+        <div class="fl s3">
+          <label>Justificativa</label>
+          <textarea id="f_just" placeholder="Justifique a sua recomendação final…"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn btn-ghost" onclick="resetAll()">↺ Limpar</button>
+    <button class="btn btn-generate" onclick="generateReport()">Gerar Relatório →</button>
+  </div>
+
+</div><!-- /form-wrap -->
+</div><!-- /panelForm -->
+
+<!-- ═══ REPORT PANEL ═══ -->
+<div class="panel" id="panelReport">
+<div class="report-wrap">
+
+  <div class="report-actions">
+    <button class="btn btn-ghost" onclick="switchTab('form')">← Editar</button>
+    <button class="btn btn-ghost btn-print" onclick="window.print()">🖨 Imprimir / PDF</button>
+  </div>
+
+  <div id="reportOutput">
+    <div class="empty-state">
+      <div class="es-icon">📋</div>
+      <p>Preencha o formulário e clique em "Gerar Relatório"</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════ SCRIPT ═══════════════ -->
+<script>
+// ── ATTRIBUTES CONFIG ──
+const ATTRS = [
+  { key:'tecnica',      label:'Técnica / Fundamentos' },
+  { key:'velocidade',   label:'Velocidade / Aceleração' },
+  { key:'fisico',       label:'Físico / Duelo' },
+  { key:'posicionamento', label:'Posicionamento' },
+  { key:'decisao',      label:'Tomada de Decisão' },
+  { key:'passe',        label:'Passe / Distribuição' },
+  { key:'drible',       label:'Drible / 1x1' },
+  { key:'aerial',       label:'Jogo Aéreo' },
+  { key:'visao',        label:'Visão de Jogo' },
+  { key:'intensidade',  label:'Intensidade / Pressão' },
+  { key:'recuperacao',  label:'Recuperação Defensiva' },
+  { key:'mental',       label:'Mentalidade / Liderança' },
+];
+
+const scores = {};
+
+// ── BUILD ATTR DOTS ──
+const container = document.getElementById('attrsContainer');
+ATTRS.forEach(attr => {
+  scores[attr.key] = 0;
+  const div = document.createElement('div');
+  div.className = 'attr-row';
+  div.innerHTML = `
+    <div class="attr-row-top">
+      <span>${attr.label}</span>
+      <span class="attr-score" id="sc_${attr.key}">—</span>
+    </div>
+    <div class="attr-dots" id="dots_${attr.key}">
+      ${Array.from({length:10},(_,i)=>`<div class="dot" data-k="${attr.key}" data-v="${i+1}"></div>`).join('')}
+    </div>
+  `;
+  container.appendChild(div);
+});
+
+container.addEventListener('click', e => {
+  const dot = e.target.closest('.dot');
+  if (!dot) return;
+  const k = dot.dataset.k, v = parseInt(dot.dataset.v);
+  scores[k] = v;
+
+  const row = document.getElementById('dots_'+k);
+  row.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.remove('filled','low','mid','hi');
+    if (i < v) {
+      d.classList.add('filled');
+      if (v <= 3) d.classList.add('low');
+      else if (v <= 6) d.classList.add('mid');
+      else d.classList.add('hi');
+    }
+  });
+
+  document.getElementById('sc_'+k).textContent = v;
+});
+
+// ── PHOTO PREVIEW ──
+document.getElementById('f_foto').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    const img = document.getElementById('photo-preview');
+    img.src = e.target.result;
+    img.style.display = 'block';
+    window._photoB64 = e.target.result;
+  };
+  r.readAsDataURL(file);
+});
+
+// ── TABS ──
+function switchTab(tab) {
+  document.getElementById('panelForm').classList.toggle('active', tab === 'form');
+  document.getElementById('panelReport').classList.toggle('active', tab === 'report');
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', (tab === 'form' && i === 0) || (tab === 'report' && i === 1));
+  });
+}
+
+// ── HELPERS ──
+function v(id) { return document.getElementById(id).value.trim(); }
+
+function fmt(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T12:00:00');
+  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'});
+}
+
+function calcAge(dobStr) {
+  if (!dobStr) return '';
+  const dob = new Date(dobStr + 'T12:00:00');
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const m = today.getMonth() - dob.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+  return `${age} anos`;
+}
+
+function barColor(n) {
+  if (n <= 3)  return '#e84a4a';
+  if (n <= 6)  return '#e8a44a';
+  if (n <= 8)  return '#e8c84a';
+  return '#4ae890';
+}
+
+function recLabel(r) {
+  const map = { A:'✅ A — Contratar', B:'🔵 B — Monitorar', C:'🟡 C — Observar', D:'🔴 D — Não recom.' };
+  return map[r] || r;
+}
+
+function getFilledAttrs() {
+  return ATTRS.filter(a => scores[a.key] > 0);
+}
+
+// ── GENERATE REPORT ──
+function generateReport() {
+  const nome  = v('f_nome') || 'Atleta Sem Nome';
+  const clube = v('f_clube');
+  const pos   = v('f_pos');
+  const nac   = v('f_nac');
+  const dob   = v('f_dob');
+  const comp  = v('f_comp');
+  const data  = fmt(v('f_data'));
+  const scout = v('f_scout');
+  const tA    = v('f_timeA');
+  const tB    = v('f_timeB');
+  const placar = v('f_placar');
+  const pe    = v('f_pe');
+  const alt   = v('f_alt');
+  const fis   = v('f_fis');
+  const cont  = fmt(v('f_contrato'));
+  const tmVal = v('f_tm_val');
+  const nota  = v('f_nota');
+  const rec   = v('f_rec');
+  const prio  = v('f_prio');
+  const just  = v('f_just');
+  const forc  = v('f_forcas');
+  const fraq  = v('f_fraquezas');
+  const obs   = v('f_obs');
+  const photo = window._photoB64 || null;
+
+  const filledAttrs = getFilledAttrs();
+
+  // Match header
+  const matchLine = (tA && tB) ? `${tA} <span style="color:var(--muted);margin:0 0.3rem">vs</span> ${tB}` : (tA || tB || '');
+
+  // Photo column HTML
+  const photoHTML = photo
+    ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;filter:grayscale(15%) contrast(1.05)">`
+    : `<div class="rc-photo-placeholder">👤</div>`;
+
+  // Attributes HTML
+  const attrsHTML = filledAttrs.length > 0 ? `
+    <div class="rc-attrs">
+      <div class="rc-attrs-title">Atributos Técnicos</div>
+      <div class="rc-attr-list">
+        ${filledAttrs.map(a => `
+          <div class="rc-attr-item">
+            <div class="rc-attr-item-top">
+              <span class="rc-attr-name">${a.label}</span>
+              <span class="rc-attr-num">${scores[a.key]}</span>
+            </div>
+            <div class="rc-attr-bar">
+              <div class="rc-attr-fill" style="width:${scores[a.key]*10}%;background:${barColor(scores[a.key])}"></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  // SW HTML
+  const swHTML = (forc || fraq) ? `
+    <div class="rc-sw">
+      <div class="rc-sw-col sw-strong">
+        <div class="rc-sw-title">Strengths</div>
+        <div class="rc-sw-text">${forc || '<span style="opacity:.3">—</span>'}</div>
+      </div>
+      <div class="rc-sw-col sw-weak">
+        <div class="rc-sw-title">Weaknesses</div>
+        <div class="rc-sw-text">${fraq || '<span style="opacity:.3">—</span>'}</div>
+      </div>
+    </div>
+  ` : '';
+
+  // Notes HTML
+  const notesHTML = (obs || just) ? `
+    <div class="rc-notes">
+      <div class="rc-notes-title">Observações / Justificativa</div>
+      <div class="rc-notes-text">${[obs, just].filter(Boolean).join('<br><br>')}</div>
+    </div>
+  ` : '';
+
+  // Meta rows
+  const metaRows = [
+    { lbl:'D.O.B', val: dob ? `${fmt(dob)} (${calcAge(dob)})` : '—' },
+    { lbl:'Nacional.', val: nac || '—' },
+    { lbl:'Pé', val: pe || '—' },
+    { lbl:'Altura', val: alt ? `${alt} cm` : '—' },
+    { lbl:'Físico', val: fis || '—' },
+    { lbl:'Contrato', val: v('f_contrato') ? cont : '—' },
+    ...(tmVal ? [{ lbl:'Valor TM', val: tmVal, gold: true }] : []),
+  ];
+
+  // Footer
+  const footerParts = [];
+  if (rec) footerParts.push(`<span class="rc-rec-badge rec-${rec}">${recLabel(rec)}</span>`);
+  if (prio) footerParts.push(`<span style="font-size:.72rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase">Prioridade: <strong style="color:var(--text)">${prio}</strong></span>`);
+
+  const footerLeft = footerParts.length
+    ? `<div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">${footerParts.join('')}</div>`
+    : '<div></div>';
+
+  const footerRight = `
+    <div style="display:flex;align-items:center;gap:1.2rem">
+      ${nota ? `<div class="rc-overall"><span class="rc-overall-lbl">Nota</span><span class="rc-overall-num">${nota}</span></div>` : ''}
+      ${scout ? `<span class="rc-scout-lbl">Scout: ${scout}</span>` : ''}
+    </div>
+  `;
+
+  const html = `
+    <div class="report-card">
+      <!-- header strip -->
+      <div class="rc-header">
+        <div class="rc-header-left">
+          ${comp ? `<span class="rc-comp">${comp}</span>` : ''}
+          ${data !== '—' ? `<span class="rc-date">${data}</span>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:.75rem">
+          ${matchLine ? `<span class="rc-match">${matchLine}</span>` : ''}
+          ${placar ? `<span class="rc-score-pill">${placar}</span>` : ''}
+        </div>
+      </div>
+
+      <!-- body -->
+      <div class="rc-body">
+        <!-- left col -->
+        <div class="rc-left">
+          <div class="rc-photo-wrap">
+            ${photoHTML}
+            <div class="rc-pos-tag">
+              <div class="rc-position">${pos || 'Campo'}</div>
+            </div>
+          </div>
+          <div class="rc-meta">
+            ${metaRows.map(r => `
+              <div class="rc-meta-row">
+                <span class="rc-meta-lbl">${r.lbl}</span>
+                <span class="rc-meta-val${r.gold?' gold':''}">${r.val}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- right col -->
+        <div class="rc-right">
+          <div class="rc-name-area">
+            ${clube ? `<div class="rc-club-line">${clube}</div>` : ''}
+            <div class="rc-name">${nome}</div>
+            ${nac || pos ? `<div class="rc-name-sub">${[nac, pos].filter(Boolean).join(' · ')}</div>` : ''}
+          </div>
+
+          ${attrsHTML}
+          ${swHTML}
+          ${notesHTML}
+        </div>
+      </div>
+
+      <!-- footer -->
+      <div class="rc-footer">
+        ${footerLeft}
+        ${footerRight}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('reportOutput').innerHTML = html;
+  switchTab('report');
+}
+
+// ── RESET ──
+function resetAll() {
+  if (!confirm('Limpar todos os campos?')) return;
+  document.querySelectorAll('#panelForm input, #panelForm select, #panelForm textarea').forEach(el => {
+    el.value = '';
+  });
+  ATTRS.forEach(a => {
+    scores[a.key] = 0;
+    const row = document.getElementById('dots_'+a.key);
+    if (row) row.querySelectorAll('.dot').forEach(d => d.className='dot');
+    const sc = document.getElementById('sc_'+a.key);
+    if (sc) sc.textContent = '—';
+  });
+  window._photoB64 = null;
+  document.getElementById('photo-preview').style.display = 'none';
+}
+</script>
+</body>
+</html>
